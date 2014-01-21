@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.shixy.web.WsException;
-import com.shixy.web.szlib.Constant;
+import com.shixy.web.szlib.Constants;
 import com.shixy.web.szlib.response.Area;
 import com.shixy.web.szlib.response.Book;
 import com.shixy.web.szlib.response.BookReview;
@@ -59,7 +59,7 @@ public class SZLibServiceImpl implements SZLibService  {
 				user.setUserId(response.cookie("UserID"));
 				user.setUserName(URLDecoder.decode(response.cookie("Name"),"UTF-8"));
 				//通过挂失页面获取读书证卡号
-				Connection conLost = Jsoup.connect(Constant.BASE_URL+Constant.LOST_URL).timeout(1000*60);
+				Connection conLost = Jsoup.connect(Constants.BASE_URL+Constants.LOST_URL).timeout(1000*60);
 				for(Entry<String, String> entry :response.cookies().entrySet()){
 					conLost.cookie(entry.getKey(), entry.getValue());
 				}
@@ -82,7 +82,7 @@ public class SZLibServiceImpl implements SZLibService  {
 	
 	public List<LoanBook> getLoanBooks(String readerNo){
 		try {
-			Document doc = Jsoup.connect(Constant.BASE_URL+Constant.LOAN_BOOK_URL).timeout(1000*60)
+			Document doc = Jsoup.connect(Constants.BASE_URL+Constants.LOAN_BOOK_URL).timeout(1000*60)
 			.data("readerno",readerNo).parser(Parser.xmlParser()).get();
 			Elements elments = doc.getElementsByTag("meta");
 			List<LoanBook> list = new ArrayList<LoanBook>();
@@ -120,7 +120,7 @@ public class SZLibServiceImpl implements SZLibService  {
 			//先登录获取session等cookie
 			Response response = this.getLoginResponse(userName, password);
 			
-			String url = Constant.BASE_URL+Constant.RENEW_BOOK_URL+"?1=1";
+			String url = Constants.BASE_URL+Constants.RENEW_BOOK_URL+"?1=1";
 			for(String code : barCode.split(",")){
 				url += "&v_select="+code;
 			}
@@ -149,7 +149,7 @@ public class SZLibServiceImpl implements SZLibService  {
 	
 	public List<ReverseInfo> getReserveBooks(String readerNo){
 		try {
-			Document doc = Jsoup.connect(Constant.BASE_URL+Constant.RESERVE_BOOK_URL)
+			Document doc = Jsoup.connect(Constants.BASE_URL+Constants.RESERVE_BOOK_URL)
 					.data("readerno",readerNo,"finish","false","curpage","1","title","")
 					.parser(Parser.xmlParser()).get();
 			
@@ -180,7 +180,7 @@ public class SZLibServiceImpl implements SZLibService  {
 	
 	public Object getReserveBooksFinished(String readerNo,String title,String page){
 		try {
-			Document doc = Jsoup.connect(Constant.BASE_URL+Constant.RESERVE_BOOK_URL).timeout(1000*60)
+			Document doc = Jsoup.connect(Constants.BASE_URL+Constants.RESERVE_BOOK_URL).timeout(1000*60)
 							.data("readerno",readerNo,"finish","true","title",title,"curpage",page)
 							.parser(Parser.xmlParser()).get();
 		} catch (Exception e) {
@@ -215,7 +215,7 @@ public class SZLibServiceImpl implements SZLibService  {
 			page = 1;
 		}
 		try {
-			Document doc = Jsoup.connect(Constant.BASE_URL+Constant.NEWS_URL).timeout(1000*60)
+			Document doc = Jsoup.connect(Constants.BASE_URL+Constants.NEWS_URL).timeout(1000*60)
 			.data("cid",cid,"pager.offset",String.valueOf((page-1)*10)).get();
 			Elements rows = doc.select(".newstab tbody tr");
 			List<News> list = new ArrayList<News>();
@@ -237,7 +237,7 @@ public class SZLibServiceImpl implements SZLibService  {
 	public Map<String,String> getNewsDatail(String newsId){
 		try {
 			Map<String, String> map = new HashMap<String, String>();
-			Document doc = Jsoup.connect(Constant.BASE_URL+Constant.NEWS_DETAIL_URL).data("itemid",newsId).timeout(1000*60).get();
+			Document doc = Jsoup.connect(Constants.BASE_URL+Constants.NEWS_DETAIL_URL).data("itemid",newsId).timeout(1000*60).get();
 			String content = doc.select(".edittext").get(0).html();
 			String title = doc.select(".detailtitle h3").text();
 			map.put("result", content);
@@ -251,7 +251,7 @@ public class SZLibServiceImpl implements SZLibService  {
 	
 	public List<Area> getSelflibList(){
 		try {
-			Document doc = Jsoup.connect(Constant.BASE_URL+Constant.SELF_LIB_URL).timeout(1000*60).get();
+			Document doc = Jsoup.connect(Constants.BASE_URL+Constants.SELF_LIB_URL).timeout(1000*60).get();
 			Elements tables = doc.select("#showdiv3_5 table");
 			List<Area> areas = new ArrayList<Area>();
 			for(Element table : tables){
@@ -294,7 +294,7 @@ public class SZLibServiceImpl implements SZLibService  {
 		map.put("pageNum", pageNum);
 		map.put("v_page", page);
 		try {
-			Document doc = Jsoup.connect(Constant.BASE_URL+Constant.QUERY_BOOK_URL).data(map).timeout(1000*60).post();
+			Document doc = Jsoup.connect(Constants.BASE_URL+Constants.QUERY_BOOK_URL).data(map).timeout(1000*60).post();
 			Elements  list = doc.select(".booklist li");
 			List<Book> books = new ArrayList<Book>();
 			List<String> recordNoArr = new ArrayList<String>();
@@ -317,7 +317,7 @@ public class SZLibServiceImpl implements SZLibService  {
 		
 			//获取书籍是否可以预借
 			if(list.size()>0){
-				Document canReverseDoc = Jsoup.connect(Constant.BASE_URL+Constant.CAN_REVERSE_URL).timeout(1000*60)
+				Document canReverseDoc = Jsoup.connect(Constants.BASE_URL+Constants.CAN_REVERSE_URL).timeout(1000*60)
 				.data("tableList",StringUtil.join(tableArr, ","),"metaidList",StringUtil.join(recordNoArr, ","))
 				.parser(Parser.xmlParser()).get();
 			
@@ -341,7 +341,7 @@ public class SZLibServiceImpl implements SZLibService  {
 		Book book = new Book();
 		try {
 			//从深图网站获取书籍isbn  馆藏地址
-			Document doc = Jsoup.connect(Constant.BASE_URL+Constant.BOOK_URL).timeout(1000*60)
+			Document doc = Jsoup.connect(Constants.BASE_URL+Constants.BOOK_URL).timeout(1000*60)
 			.data("v_tablearray","bibliosm","v_recno",recordNo,"v_curtable","bibliosm","site","null")
 			.get();
 			String title = doc.select(".booksinfo h3.title a").text();
@@ -449,7 +449,7 @@ public class SZLibServiceImpl implements SZLibService  {
 		//date 201309
 		List<Map<String, String>> list = new ArrayList<Map<String,String>>();
 		try {
-			Document doc = Jsoup.connect(Constant.BASE_URL+Constant.NEW_BOOK_LIST).timeout(1000*60)
+			Document doc = Jsoup.connect(Constants.BASE_URL+Constants.NEW_BOOK_LIST).timeout(1000*60)
 			.data("zhuanlan","BBK","time",date).get();
 			Elements books = doc.select("table.bookbox");
 			books.remove(books.size()-1);
@@ -476,7 +476,7 @@ public class SZLibServiceImpl implements SZLibService  {
 	public List<Map<String, String>> getLibBookList(String libno) {
 		List<Map<String, String>> list = new ArrayList<Map<String,String>>();
 		try {
-			Document doc = Jsoup.connect(Constant.BASE_URL+Constant.LIB_BOOK_LIST).timeout(1000*60)
+			Document doc = Jsoup.connect(Constants.BASE_URL+Constants.LIB_BOOK_LIST).timeout(1000*60)
 			.data("v_ServiceAddr",libno).get();
 			Elements books = doc.getElementById("f1").select("li");
 			for(Element book : books){
@@ -565,7 +565,7 @@ public class SZLibServiceImpl implements SZLibService  {
 	}
 	
 	private Response getLoginResponse(String username,String pwd) throws Exception{
-		Connection conLogin = Jsoup.connect(Constant.BASE_URL+Constant.LOGIN_URL).data("username",username,"password",pwd).timeout(1000*60);
+		Connection conLogin = Jsoup.connect(Constants.BASE_URL+Constants.LOGIN_URL).data("username",username,"password",pwd).timeout(1000*60);
 		conLogin.method(Method.GET);
 		Response response = conLogin.execute();
 		return response;
@@ -575,7 +575,7 @@ public class SZLibServiceImpl implements SZLibService  {
 	public Map<String, String> changeLoginName(String username,String pwd,String loginName) {
 		try {
 			Response response = this.getLoginResponse(username, pwd);
-			Connection con = Jsoup.connect(Constant.BASE_URL+Constant.CHANGE_LOGIN_NAME).timeout(1000*60)
+			Connection con = Jsoup.connect(Constants.BASE_URL+Constants.CHANGE_LOGIN_NAME).timeout(1000*60)
 			.data("loginName",loginName);
 			for(Entry<String, String> entry :response.cookies().entrySet()){
 				con.cookie(entry.getKey(), entry.getValue());
@@ -600,7 +600,7 @@ public class SZLibServiceImpl implements SZLibService  {
 	public Map<String, String> changePwd(String username,String pwd, String newPwd) {
 		try {
 			Response response = this.getLoginResponse(username, pwd);
-			Connection con = Jsoup.connect(Constant.BASE_URL+Constant.CHANGE_PWD).timeout(1000*60)
+			Connection con = Jsoup.connect(Constants.BASE_URL+Constants.CHANGE_PWD).timeout(1000*60)
 			.data("v_NewPwd1",newPwd,"v_OldPwd",pwd).parser(Parser.xmlParser());
 			
 			for(Entry<String, String> entry :response.cookies().entrySet()){

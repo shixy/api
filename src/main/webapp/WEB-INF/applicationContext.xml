@@ -42,10 +42,13 @@
 	        </jaxrs:outInterceptors>  
 	    <jaxrs:serviceBeans>
 	        <ref bean="szLibService" />
+	        <ref bean="hnycService" />
+	        <ref bean="hnzyService" />
 	    </jaxrs:serviceBeans>
 	    <jaxrs:extensionMappings>
 	        <entry key="json" value="application/json" />
 	        <entry key="xml" value="application/xml" />
+	        <entry key="jsonp" value="application/javascript" />
 	    </jaxrs:extensionMappings>
 	    <jaxrs:languageMappings>
 	           <entry key="en" value="en-gb"/>  
