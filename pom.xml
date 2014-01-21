@@ -177,7 +177,7 @@
                 		</goals>
                 		<configuration>
                 			<changepass>false</changepass>
-                			<appid>appid944iewlw27</appid>
+                			<appid>你的百度appid</appid>
                 			<version>0</version>     			
                 		</configuration>
                 	</execution>
